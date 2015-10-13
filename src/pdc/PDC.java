@@ -62,7 +62,7 @@ public class PDC {
   }
   
   static void printUsage() {
-    System.out.println("Usage: java pdc.PDC -f1 <1st parameter file> -f2 <2nd parameter file>");
+    System.out.println("Usage: java pdc.PDC -f0 <1st parameter file> -f1 <2nd parameter file>");
     System.exit(-1);
   }
 }
