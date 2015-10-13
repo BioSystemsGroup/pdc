@@ -53,7 +53,7 @@ public class PDC {
         Object thisVal = me.getValue();
         ParameterDatabase that = pd[(ndx+1)%2];
         if (!that.exists(new ec.util.Parameter((String)me.getKey()), null)) System.out.println(me.getKey().toString() + ":  only in file "+ndx);
-        else {
+        else if (ndx==0) {
           Object thatVal = that.getProperty(thisKey);
           if (!thisVal.equals(thatVal)) System.out.print(thisKey+":\n - "+thisVal+"\n + "+thatVal+"\n");
         }

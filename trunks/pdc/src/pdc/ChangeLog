@@ -1,0 +1,5 @@
+2015-10-13  gepr  <gepr@tempusdictum.com>
+
+	* PDC.java (printUsage()): Fix usage statement from -f1, -f2 to -f0, -f1.
+	(main()): Only do the "only in" part of the loop for the 2nd file.  Don't do the diffs.
+
