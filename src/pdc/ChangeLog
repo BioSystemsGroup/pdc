@@ -1,3 +1,10 @@
+2016-10-12-16:41  gepr  <gepr@tempusdictum.com>
+
+	* PDC.java (PDC): Compare the JavaScript files as well.
+	(buildFileList()): New method that lists files in all directories with the given suffix.
+	(parseProperties()): Add argument for the list of list of files, now with .js files interleaved.  Use diffutils on both hepstructspec.properties and all .js files.
+	(diffPropertiesFiles()): Don't output anything unless there is a difference.  Reformat preamble to look like regular (unified) diff output.
+
 2016-10-12-15:42  gepr  <gepr@tempusdictum.com>
 
 	* PDC.java: Import individual Classes.
