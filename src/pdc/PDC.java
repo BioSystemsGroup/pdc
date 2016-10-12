@@ -9,7 +9,18 @@
 
 package pdc;
 
+import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
+import difflib.DiffUtils;
+import difflib.Patch;
 import ec.util.ParameterDatabase;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -22,8 +33,8 @@ public class PDC {
     CommandLineParser parser = new DefaultParser();
 
     Options options = new Options();
-    options.addOption( "f0", "file0", true, "The 1st parameter file." );
-    options.addOption( "f1", "file1", true, "The 2nd parameter file." );
+    options.addOption( "d0", "dir0", true, "The 1st configuration directory." );
+    options.addOption( "d1", "dir1", true, "The 2nd configuration directory." );
 
     CommandLine cla = null;
     try {
@@ -32,18 +43,83 @@ public class PDC {
       System.out.println( "Unexpected exception:" + exp.getMessage() ); 
     }
 
-    if (cla == null || !cla.hasOption("file0") || !cla.hasOption("file1")) 
+    if (cla == null || !cla.hasOption("dir0") || !cla.hasOption("dir1")) 
       printUsage();
     
-    String[] fn = new String[2];
-    fn[0] = cla.getOptionValue("file0");
-    fn[1] = cla.getOptionValue("file1");
+    String[] dn = new String[2];
+    dn[0] = cla.getOptionValue("dir0");
+    dn[1] = cla.getOptionValue("dir1");
+    
+    parseProperties(dn);
+    
+  }
+
+  public static void parseProperties(String[] dn) {
+    File[] dirs = new File[dn.length]; // get dirs from names
+    
+    // get all the .properties files in each dir
+    ArrayList<ArrayList> files = new ArrayList<>(2);
+    for (int dNdx=0 ; dNdx<dn.length ; dNdx++) {
+      dirs[dNdx] = new File(dn[dNdx]);
+      File[] file_array = dirs[dNdx].listFiles((File dir, String name) -> (name.endsWith(".properties") ));
+      ArrayList<File> file_list = new ArrayList(Arrays.asList(file_array));
+      files.add(file_list);
+    }
+    
+    // for each file in each dir, check for that file in the other dir
+    for (int lNdx=0 ; lNdx< 2 ; lNdx++) {
+      ArrayList<File> this_list = files.get(lNdx);
+      for (File f : this_list) {
+        ArrayList<File> that_list = files.get((lNdx+1)%2);
+        File that_file = null;
+        if ((that_file = listContainsTail(that_list, f.getName())) == null) 
+          System.out.println(f+" only in "+dn[lNdx]);
+        else if (lNdx==0) {
+          File[] fn = {f, that_file};
+          if (!f.getName().contains("hepstructspec")) {
+            diffPropertiesFiles(fn);
+          } else {
+            diffTextFiles(fn);
+          }
+        }
+      }
+    }
+  }
+
+  private static void diffTextFiles(File[] fn) {
+    List<LinkedList<String>> lines  = new ArrayList<>();
+    String line = "";
+    for (int ndx=0 ; ndx<fn.length ; ndx++) {
+      LinkedList<String> ls = new LinkedList<>();
+      try {
+        BufferedReader in = new BufferedReader(new FileReader(fn[ndx]));
+        while ((line = in.readLine()) != null) {
+          ls.add(line);
+        }
+      } catch (IOException e) { throw new RuntimeException(e); }
+      lines.add(ls);
+    }
+    Patch patch = DiffUtils.diff(lines.get(0), lines.get(1));
+    List<String> uList = DiffUtils.generateUnifiedDiff(fn[0].getPath(), fn[1].getPath(), lines.get(0), patch, 1);
+    for (String s : uList) {
+      System.out.println(s);
+    }
+  }
+  
+  public static File listContainsTail(ArrayList<File> l, String fn) {
+    for (File f : l) {
+      if (f.getName().equals(fn)) return f;
+    }
+    return null;
+  }
+  
+  public static void diffPropertiesFiles(File[] fn) {
     System.out.println("Parsing "+fn[0]+" and "+fn[1]);
     ParameterDatabase[] pd = new ParameterDatabase[2];
     try {
       for (int ndx=0 ; ndx<2 ; ndx++)
-        pd[ndx] = new ParameterDatabase( new java.io.FileInputStream(new java.io.File(fn[ndx])));
-    } catch (java.io.IOException ioe) {
+        pd[ndx] = new ParameterDatabase( new FileInputStream(fn[ndx]));
+    } catch (IOException ioe) {
       System.err.println( ioe.getMessage() );
       System.exit( -1 );
     }
@@ -62,7 +138,7 @@ public class PDC {
   }
   
   static void printUsage() {
-    System.out.println("Usage: java pdc.PDC -f0 <1st parameter file> -f1 <2nd parameter file>");
+    System.out.println("Usage: java pdc.PDC -d0 <1st cfg dir> -d1 <2nd cfg dir>");
     System.exit(-1);
   }
 }

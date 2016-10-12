@@ -1,3 +1,11 @@
+2016-10-12-15:42  gepr  <gepr@tempusdictum.com>
+
+	* PDC.java: Import individual Classes.
+	(PDC): Change argument semantics from files to directories.
+	(parseProperties()): Subsume behavior into a method.
+	(listContainsTail()): New method to check for String.endsWith().
+	(diffTextFiles()): New method uses difflib to diff text files (i.e. not EC parameter databases).
+
 2015-10-13  gepr  <gepr@tempusdictum.com>
 
 	* PDC.java (printUsage()): Fix usage statement from -f1, -f2 to -f0, -f1.
