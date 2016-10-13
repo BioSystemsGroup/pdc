@@ -21,49 +21,47 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 public class PDC {
 
   public static void main(String[] args) {
-    CommandLineParser parser = new DefaultParser();
-
-    Options options = new Options();
-    options.addOption( "d0", "dir0", true, "The 1st configuration directory." );
-    options.addOption( "d1", "dir1", true, "The 2nd configuration directory." );
-
-    CommandLine cla = null;
-    try {
-      cla = parser.parse(options, args);
-    } catch (ParseException exp) {
-      System.out.println( "Unexpected exception:" + exp.getMessage() ); 
-    }
-
-    if (cla == null || !cla.hasOption("dir0") || !cla.hasOption("dir1")) 
-      printUsage();
+    File[] dirs = new File[2];
+    if (!testArgs(dirs,args))  printUsage();
     
     String[] dn = new String[2];
-    dn[0] = cla.getOptionValue("dir0");
-    dn[1] = cla.getOptionValue("dir1");
+    dn[0] = args[0];
+    dn[1] = args[1];
     
-    ArrayList<ArrayList> files = buildFileList(dn, ".properties");
-    ArrayList<ArrayList> jsFiles = buildFileList(dn, ".js");
+    ArrayList<ArrayList> files = buildFileList(dirs, ".properties");
+    ArrayList<ArrayList> jsFiles = buildFileList(dirs, ".js");
     files.get(0).addAll(jsFiles.get(0));
     files.get(1).addAll(jsFiles.get(1));
     parseProperties(dn, files);
   }
+  
+  private static boolean testArgs(File[] fl, String[] a) {
+    for (int aNdx=0 ; aNdx<a.length ; aNdx++) {
+      if (a[aNdx] != null) fl[aNdx] = new File(a[aNdx]);
+      else {
+        return false;
+      }
+      if (!fl[aNdx].exists()) {
+        System.err.println(a[aNdx]+" does not exist.");
+        return false;
+      }
+      if (!fl[aNdx].isDirectory()) {
+        System.err.println(a[aNdx]+" is not a directory.");
+        return false;
+      }
+    }
+    return true;
+  }
 
-  private static ArrayList<ArrayList> buildFileList(String[] dn, String suffix) {
-    File[] dirs = new File[dn.length]; // get dirs from names
+  private static ArrayList<ArrayList> buildFileList(File[] dn, String suffix) {
     // get all the .properties files in each dir
     ArrayList<ArrayList> files = new ArrayList<>(2);
     for (int dNdx=0 ; dNdx<dn.length ; dNdx++) {
-      dirs[dNdx] = new File(dn[dNdx]);
-      File[] file_array = dirs[dNdx].listFiles((File dir, String name) -> (name.endsWith(suffix) ));
+      File[] file_array = dn[dNdx].listFiles((File dir, String name) -> (name.endsWith(suffix) ));
       ArrayList<File> file_list = new ArrayList(Arrays.asList(file_array));
       files.add(file_list);
     }
@@ -150,7 +148,7 @@ public class PDC {
   }
   
   static void printUsage() {
-    System.out.println("Usage: java pdc.PDC -d0 <1st cfg dir> -d1 <2nd cfg dir>");
+    System.out.println("Usage: java pdc.PDC <1st cfg dir> <2nd cfg dir>");
     System.exit(-1);
   }
 }

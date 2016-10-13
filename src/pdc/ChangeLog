@@ -1,3 +1,10 @@
+2016-10-13  gepr  <gepr@tempusdictum.com>
+
+	* PDC.java: Remove commons dependency.
+	(main(), buildFileList()): Remove "-d?" cli options.  Follow the way diff works and just assume the 1st 2 args are the directories to be diffed.
+	(testArgs()): new method that test the args and creates the Files for testing.
+	(printUsage()): Change usage to reflect the above.
+
 2016-10-12-16:41  gepr  <gepr@tempusdictum.com>
 
 	* PDC.java (PDC): Compare the JavaScript files as well.
