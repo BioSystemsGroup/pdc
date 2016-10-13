@@ -1,3 +1,11 @@
+2016-10-13-16:31  gepr  <gepr@tempusdictum.com>
+
+	* PDC.java (main()): Include .json files.
+	(buildFileList()): Sort the files by name (or whatever their natural sort is).
+	(parseProperties()): Use endsWith() instead of contains to avoid conflicts between .js and .json.  Invoke diffJSONFiles().
+	(diffJSONFiles()): New method for diffing .json hepinit files.  It only finds the 1st diff in any JsonStructure because the hepatocyte_records structure is so large.  If we add other structures or other .json files in the future, we may have to change this.
+	(indexOfDifference()): Copied from Apache Commons Lang library.
+
 2016-10-13  gepr  <gepr@tempusdictum.com>
 
 	* PDC.java: Remove commons dependency.
