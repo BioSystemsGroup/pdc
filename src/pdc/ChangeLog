@@ -1,3 +1,8 @@
+2017-08-14-11:18  gepr  <gepr@tempusdictum.com>
+
+	* PDC.java (testArgs()): Print usage if there are no arguments.
+	(diffPropertiesFiles()): Report the experiment directory rather than the file number for "only in".
+
 2016-10-13-16:31  gepr  <gepr@tempusdictum.com>
 
 	* PDC.java (main()): Include .json files.

@@ -43,6 +43,7 @@ public class PDC {
   }
   
   private static boolean testArgs(File[] fl, String[] a) {
+    if (a.length <= 0) return false;
     for (int aNdx=0 ; aNdx<a.length ; aNdx++) {
       if (a[aNdx] != null) fl[aNdx] = new File(a[aNdx]);
       else {
@@ -194,7 +195,7 @@ public class PDC {
         Object thisVal = me.getValue();
         ParameterDatabase that = pd[(ndx+1)%2];
         if (!that.exists(new ec.util.Parameter((String)me.getKey()), null)) {
-          output.append(me.getKey().toString() + ":  only in file "+ndx+"\n");
+          output.append(me.getKey().toString() + ":  only in "+fn[ndx].getParent()+"\n");
           diffsFound = true;
         } else if (ndx==0) {
           Object thatVal = that.getProperty(thisKey);
